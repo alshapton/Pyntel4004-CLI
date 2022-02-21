@@ -127,3 +127,17 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+*.bin
+
+q.obj
+
+qk4004.h
+
+src/.DS_Store
+
+*.obj
+
+*.h
+
+*.core
