@@ -6,8 +6,7 @@ setup(
     py_modules='4004cli',
     install_requires=[
         'Click',
-	'cloup',
-    ],
+	],
     entry_points='''
         [console_scripts]
         4004=4004cli:cli

@@ -1,3 +1,10 @@
+# Import system libraries
+import os
+import sys
+
+# Import resources library (part of setuptools)
+import pkg_resources
+
 # Import click library
 import click
 
@@ -6,16 +13,22 @@ from hardware.processor import Processor
 from assembler.assemble import assemble
 from disassembler.disassemble import disassemble
 from executer.execute import execute
-from shared.shared import print_messages, do_error
+from executer.exe_supporting import retrieve
+from shared.shared import do_error, print_messages
+
+__version__ = pkg_resources.require("Pyntel4004-cli")[0].version
 
 
-__version__ = '1.0'
+def validate_bytes(ctx, param, value):
+    if value < 1 or value > 4096:
+        raise click.BadParameter("Bytes should be between 1 and 4096")
 
 
 @click.group()
 @click.help_option('--help', '-h')
 @click.version_option(__version__, '--version', '-v',
-                      prog_name='Pyntel4004-CLI (4004)',
+                      prog_name='Pyntel4004-cli (' +
+                      os.path.basename(sys.argv[0]) + ')',
                       message='%(prog)s, Version %(version)s \n' +
                       'Learn more at https://github.com/alshapton/Pyntel4004')
 @click.pass_context
@@ -34,20 +47,24 @@ def cli(ctx):
               help='4004 assembler source code.', required=True,
               type=str, metavar='<filename>')
 @click.option('--output', '-o', prompt='Output file:',
-              help='4004 output file.', metavar='<filename>')
+              help='4004 output file.', default='4004.out',
+              metavar='<filename>')
 @click.option('--exec', '-x', is_flag=True, help='Execute program')
-@click.option('--quiet', '-q', is_flag=True, help='No output mode')
-@click.option('--monitor', '-m', is_flag=True, help='Monitor on/off')
+@click.option('--quiet', '-q', is_flag=True,
+              help='Output on/off  [either/or   ]')
+@click.option('--monitor', '-m', is_flag=True,
+              help='Monitor on/off [but not both]')
 @click.help_option('--help', '-h')
 def asm(input, output, exec, monitor, quiet):
     """Assemble the input file"""
     # Create new instance of a processor
     chip = Processor()
     # Check exclusiveness of parameters
+    # Raise an error if not allowed
     if quiet and monitor:
-        do_error('4004: Invalid Parameter Combination: (' +
-                 '--quiet and --monitor cannot be used together)')
-        exit()
+        raise click.BadParameter("Invalid Parameter Combination: " +
+                                 "--quiet and --monitor cannot be used " +
+                                 "together\n")
 
     result = assemble(input, output, chip, quiet)
     if result and exec:
@@ -61,13 +78,38 @@ def asm(input, output, exec, monitor, quiet):
 
 
 @cli.command()
-@click.option('--source', '-s', prompt='Source file:',
-              help='4004 assembler source code.', required=True, type=str)
 @click.option('--object', '-o', prompt='Object file:',
-              help='4004 object file.')
-def dis(source, object):
-    """Disassemble the file"""
+              help='4004 object or binary file (specify extension)',
+              metavar='<filename>',
+              required=True, type=str)
+@click.option('--bytes', '-b', prompt='Bytes:',
+              help='Bytes to disassemble',
+              metavar='< Between 1 and 4096 >',
+              callback=validate_bytes,
+              type=int)
+@click.help_option('--help', '-h')
+def dis(object, bytes):
+    """Disassemble the input file"""
 
     # Create new instance of a processor
     chip = Processor()
-    _ = disassemble(source, object, chip)
+    result = retrieve(object, chip, True)
+    memory_space = result[0]
+    disassemble(chip, memory_space, 0)
+
+
+@cli.command()
+@click.option('--object', '-o', prompt='Object file:',
+              help='4004 object or binary file (specify extension)',
+              metavar='<filename>',
+              required=True, type=str)
+@click.option('--quiet', '-q', is_flag=True,
+              help='Output on/off')
+@click.help_option('--help', '-h')
+def exe(object, quiet):
+    """Execute the object file"""
+    # Create new instance of a processor
+    chip = Processor()
+    result = retrieve(object, chip, quiet)
+    memory_space = result[0]
+    execute(chip, memory_space, 0, False, quiet)
