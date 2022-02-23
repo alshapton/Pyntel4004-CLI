@@ -14,9 +14,11 @@ from assembler.assemble import assemble
 from disassembler.disassemble import disassemble
 from executer.execute import execute
 from executer.exe_supporting import retrieve
-from shared.shared import do_error, print_messages
+from shared.shared import print_messages
 
-__version__ = pkg_resources.require("Pyntel4004-cli")[0].version
+package = "Pyntel4004-cli"
+module = os.path.basename(sys.argv[0])
+__version__ = pkg_resources.require(package)[0].version
 
 
 def validate_bytes(ctx, param, value):
@@ -27,8 +29,7 @@ def validate_bytes(ctx, param, value):
 @click.group()
 @click.help_option('--help', '-h')
 @click.version_option(__version__, '--version', '-v',
-                      prog_name='Pyntel4004-cli (' +
-                      os.path.basename(sys.argv[0]) + ')',
+                      prog_name=package + ' (' + module + ')',
                       message='%(prog)s, Version %(version)s \n' +
                       'Learn more at https://github.com/alshapton/Pyntel4004')
 @click.pass_context
