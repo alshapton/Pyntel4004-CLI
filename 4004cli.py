@@ -22,11 +22,6 @@ __version__ = pkg_resources.require(package)[0].version
 __Pyntel4004_version__ = pkg_resources.require('Pyntel4004')[0].version
 
 
-def validate_bytes(ctx, param, value):
-    if value < 1 or value > 4096:
-        raise click.BadParameter("Bytes should be between 1 and 4096")
-
-
 @click.group()
 @click.help_option('--help', '-h')
 @click.version_option(__version__, '--version', '-v',
@@ -85,15 +80,20 @@ def asm(input, output, exec, monitor, quiet):
               help='4004 object or binary file (specify extension)',
               metavar='<filename>',
               required=True, type=str)
-@click.option('--bytes', '-b', prompt='Bytes:',
+@click.option('--byte', '-b',
               help='Bytes to disassemble',
-              metavar='< Between 1 and 4096 >',
-              callback=validate_bytes,
+              metavar='<Between 1 & 4096>',
               type=int)
 @click.help_option('--help', '-h')
-def dis(object, bytes):
+def dis(object, byte):
     """Disassemble the input file"""
+    if byte is None:
+        byte = 4096
+    else:
+        if byte < 1 or byte > 4096:
+            raise click.BadParameter("Bytes should be between 1 and 4096")
 
+    print('Disassembling ' + str(byte) + ' bytes')
     # Create new instance of a processor
     chip = Processor()
     result = retrieve(object, chip, True)

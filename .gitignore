@@ -141,3 +141,7 @@ src/.DS_Store
 *.h
 
 *.core
+
+images/.DS_Store
+
+.DS_Store
