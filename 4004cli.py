@@ -19,6 +19,7 @@ from shared.shared import print_messages
 package = "Pyntel4004-cli"
 module = os.path.basename(sys.argv[0])
 __version__ = pkg_resources.require(package)[0].version
+__Pyntel4004_version__ = pkg_resources.require('Pyntel4004')[0].version
 
 
 def validate_bytes(ctx, param, value):
@@ -30,7 +31,8 @@ def validate_bytes(ctx, param, value):
 @click.help_option('--help', '-h')
 @click.version_option(__version__, '--version', '-v',
                       prog_name=package + ' (' + module + ')',
-                      message='%(prog)s, Version %(version)s \n' +
+                      message='%(prog)s, Version %(version)s \nPyntel4004 ' +
+                      'Version: ' + __Pyntel4004_version__ + '\n' +
                       'Learn more at https://github.com/alshapton/Pyntel4004')
 @click.pass_context
 def cli(ctx):
