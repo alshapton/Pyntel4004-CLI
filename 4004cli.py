@@ -80,25 +80,25 @@ def asm(input, output, exec, monitor, quiet):
               help='4004 object or binary file (specify extension)',
               metavar='<filename>',
               required=True, type=str)
-@click.option('--byte', '-b',
-              help='Bytes to disassemble',
+@click.option('--inst', '-i',
+              help='Instuctions to disassemble',
               metavar='<Between 1 & 4096>',
               type=int)
 @click.help_option('--help', '-h')
-def dis(object, byte):
+def dis(object, inst):
     """Disassemble the input file"""
-    if byte is None:
-        byte = 4096
+    if inst is None:
+        inst = 4096
     else:
-        if byte < 1 or byte > 4096:
-            raise click.BadParameter("Bytes should be between 1 and 4096")
+        if inst < 1 or inst > 4096:
+            raise click.BadParameter("Instructions should be between " +
+                                     "1 and 4096")
 
-    print('Disassembling ' + str(byte) + ' bytes')
     # Create new instance of a processor
     chip = Processor()
     result = retrieve(object, chip, True)
     memory_space = result[0]
-    disassemble(chip, memory_space, 0)
+    disassemble(chip, memory_space, 0, inst)
 
 
 @cli.command()
