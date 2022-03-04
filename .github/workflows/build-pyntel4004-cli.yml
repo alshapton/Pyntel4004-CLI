@@ -44,14 +44,16 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       max-parallel: 3
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
+        python_version: [3.8, 3.9, 3.10]
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python 3.9
+    - name: Set up Python 3.x
       uses: actions/setup-python@v2
       with:
-        python-version: 3.9
+        python-version: ${{ matrix.python_version }}
     - name: Get the current branch name
       shell: bash
       run: echo "::set-output name=branch::${GITHUB_REF#refs/heads/}"; echo "Branch Name = ${GITHUB_REF#refs/heads/}"
