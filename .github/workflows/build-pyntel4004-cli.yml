@@ -63,6 +63,7 @@ jobs:
         GITHUB_CONTEXT: ${{ toJSON(github) }}
       run: echo "$GITHUB_CONTEXT"
     - name: Install dependencies
+      shell: bash
       run: |
         # Update pip and install flake8, pytest and coverage
         python -m pip install --upgrade pip
