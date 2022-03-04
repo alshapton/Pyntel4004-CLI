@@ -9,17 +9,58 @@ import pkg_resources
 import click
 
 # Import Pyntel4004 functionality
-from hardware.processor import Processor
 from assembler.assemble import assemble
 from disassembler.disassemble import disassemble
 from executer.execute import execute
 from executer.exe_supporting import retrieve
+from hardware.processor import Processor
 from shared.shared import print_messages
 
 package = "Pyntel4004-cli"
+core_name = 'Pyntel4004'
+cini = core_name + ' core is not installed - use \n\n' + \
+        '       pip install ' + core_name + '\n'
 module = os.path.basename(sys.argv[0])
 __version__ = pkg_resources.require(package)[0].version
-__Pyntel4004_version__ = pkg_resources.require('Pyntel4004')[0].version
+__Pyntel4004_version__ = 'Installed'
+
+try:
+    __Pyntel4004_version__ = pkg_resources.require(core_name)[0].version
+except:
+    __Pyntel4004_version__ = 'Not Installed'
+else:
+    __Pyntel4004_version__ = 'Installed but no legal version'
+
+
+def is_core_installed(package_name: str):
+    """
+    Check to see if the Pyntel4004 core is installed
+
+    Parameters
+    ----------
+    package_name: str, mandatory
+        Name of the Pyntel4004 core package
+
+    Returns
+    -------
+    True    - if the core package is installed
+    False   - if not
+
+    Raises
+    ------
+    N/A
+
+    Notes
+    -----
+    N/A
+
+    """
+    import importlib.util
+    spec = importlib.util.find_spec(package_name)
+    if spec is None:
+        return False
+    else:
+        return True
 
 
 @click.group()
@@ -55,6 +96,11 @@ def cli(ctx):
 @click.help_option('--help', '-h')
 def asm(input, output, exec, monitor, quiet):
     """Assemble the input file"""
+
+    # Ensure that the core Pyntel4004 is installed
+    # Exit if not
+    if not is_core_installed(core_name):
+        raise click.ClickException(cini)
     # Create new instance of a processor
     chip = Processor()
     # Check exclusiveness of parameters
@@ -85,8 +131,13 @@ def asm(input, output, exec, monitor, quiet):
               metavar='<Between 1 & 4096>',
               type=int)
 @click.help_option('--help', '-h')
-def dis(object, inst):
+def dis(object, inst) -> None:
     """Disassemble the input file"""
+
+    # Ensure that the core Pyntel4004 is installed
+    # Exit if not
+    if not is_core_installed(core_name):
+        raise click.ClickException(cini)
     if inst is None:
         inst = 4096
     else:
@@ -111,6 +162,10 @@ def dis(object, inst):
 @click.help_option('--help', '-h')
 def exe(object, quiet):
     """Execute the object file"""
+    # Ensure that the core Pyntel4004 is installed
+    # Exit if not
+    if not is_core_installed(core_name):
+        raise click.ClickException(cini)
     # Create new instance of a processor
     chip = Processor()
     result = retrieve(object, chip, quiet)
