@@ -130,10 +130,12 @@ def asm(input, output, exec, monitor, quiet):
               help='Instuctions to disassemble',
               metavar='<Between 1 & 4096>',
               type=int)
+@click.option('--labels', '-l',
+              help='Show label table',
+              is_flag=True, default=False)
 @click.help_option('--help', '-h')
-def dis(object, inst) -> None:
+def dis(object, inst, labels) -> None:
     """Disassemble the input file"""
-
     # Ensure that the core Pyntel4004 is installed
     # Exit if not
     if not is_core_installed(core_name):
@@ -144,12 +146,10 @@ def dis(object, inst) -> None:
         if inst < 1 or inst > 4096:
             raise click.BadParameter("Instructions should be between " +
                                      "1 and 4096")
-
     # Create new instance of a processor
     chip = Processor()
-    result = retrieve(object, chip, True)
-    memory_space = result[0]
-    disassemble(chip, memory_space, 0, inst)
+    memory_space, _, lbls = retrieve(object, chip, False)
+    disassemble(chip, memory_space, 0, inst, labels, lbls)
 
 
 @cli.command()
