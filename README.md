@@ -2,6 +2,8 @@
 
 ![Pyntel4004-cli Logo](https://raw.githubusercontent.com/alshapton/Pyntel4004-cli/main/images/pyntel4004-cli.png)
 
+[![SonarCloud](https://sonarcloud.io/images/project_badges/sonarcloud-white.svg)](https://sonarcloud.io/summary/new_code?id=alshapton_Pyntel4004-cli)
+
 <h1>Command Line Interface for Pyntel4004</h1>
 
 ### Basic Usage.### Basic Usage.

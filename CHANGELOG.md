@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Notes
 - 
 ### Added
-- --labels option to disassembler
+- --labels option to Disassembler
 ### Changed
 - 
 ### Deprecated
