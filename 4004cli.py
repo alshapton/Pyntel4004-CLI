@@ -22,14 +22,14 @@ cini = core_name + ' core is not installed - use \n\n' + \
         '       pip install ' + core_name + '\n'
 module = os.path.basename(sys.argv[0])
 __version__ = pkg_resources.require(package)[0].version
-__Pyntel4004_version__ = 'Installed'
+__core_version__ = 'Installed'
 
 try:
-    __Pyntel4004_version__ = pkg_resources.require(core_name)[0].version
+    __core_version__ = pkg_resources.require(core_name)[0].version
 except:
-    __Pyntel4004_version__ = 'Not Installed'
+    __core_version__ = 'Not Installed'
 else:
-    __Pyntel4004_version__ = 'Installed but no legal version'
+    __core_version__ = 'Installed but no legal version'
 
 
 def is_core_installed(package_name: str):
@@ -68,7 +68,7 @@ def is_core_installed(package_name: str):
 @click.version_option(__version__, '--version', '-v',
                       prog_name=package + ' (' + module + ')',
                       message='%(prog)s, Version %(version)s \nPyntel4004 ' +
-                      'Version: ' + __Pyntel4004_version__ + '\n' +
+                      'Version: ' + __core_version__ + '\n' +
                       'Learn more at https://github.com/alshapton/Pyntel4004')
 @click.pass_context
 def cli(ctx):
@@ -85,16 +85,19 @@ def cli(ctx):
 @click.option('--input', '-i', prompt='Input file:',
               help='4004 assembler source code.', required=True,
               type=str, metavar='<filename>')
-@click.option('--output', '-o', prompt='Output file:',
-              help='4004 output file.', default='4004.out',
+@click.option('--output', '-o', prompt='Output file (without extension):',
+              help='4004 output file (without extension).', default='default',
               metavar='<filename>')
 @click.option('--exec', '-x', is_flag=True, help='Execute program')
 @click.option('--quiet', '-q', is_flag=True,
               help='Output on/off  [either/or   ]')
 @click.option('--monitor', '-m', is_flag=True,
               help='Monitor on/off [but not both]')
+@click.option('--type', '-t', multiple=True, default=['ALL'],
+              metavar='<extension>',
+              help='Multiple output types can be specified - bin/obj/h/ALL')
 @click.help_option('--help', '-h')
-def asm(input, output, exec, monitor, quiet):
+def asm(input, output, exec, monitor, quiet, type):
     """Assemble the input file"""
 
     # Ensure that the core Pyntel4004 is installed
@@ -109,8 +112,8 @@ def asm(input, output, exec, monitor, quiet):
         raise click.BadParameter("Invalid Parameter Combination: " +
                                  "--quiet and --monitor cannot be used " +
                                  "together\n")
-
-    result = assemble(input, output, chip, quiet)
+    print(type)
+    result = assemble(input, output, chip, quiet, type)
     if result and exec:
         print_messages(quiet, 'EXEC', chip, '')
         did_execute = execute(chip, 'rom', 0, monitor, quiet)
