@@ -1,0 +1,20 @@
+# Configuration for 4004-cli.
+
+title = "Configuration"
+
+[asm]
+input = "fred"
+output = "fred"
+type = ["BIN", "H"]
+exec = true
+monitor = true
+quiet = false
+
+[dis]
+object = "examples/example2.obj"
+inst = 3
+labels = false
+
+[exe]
+object = "fred"
+quiet = true
