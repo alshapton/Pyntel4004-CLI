@@ -16,5 +16,5 @@ inst = 3
 labels = false
 
 [exe]
-object = "fred"
+object = "examples/example2.obj"
 quiet = true
