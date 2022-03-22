@@ -76,7 +76,7 @@ jobs:
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
   pypi-publish:
-    needs: [build, SonarCloud]
+    needs: [build, sonarcloud]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -106,30 +106,30 @@ jobs:
         python -m build ;
         python -m twine upload dist/* ;
         fi
-    documentation-publish:
-      needs: [build, SonarCloud]
-      runs-on: ubuntu-latest
-      steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python 3.9
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.9
-      - name: Get the current branch name
-        shell: bash
-        run: echo "::set-output name=branch::${GITHUB_REF#refs/heads/}"; echo "Branch Name = ${GITHUB_REF#refs/heads/}"
-        id: branch_name
-      - name: Build documentation only if on release branch
-        working-directory: ./docs
-        run: |
-          BRANCH_NAME="${{ steps.branch_name.outputs.branch }}"
-          if [[ "${BRANCH_NAME:0:8}" = "release/" ]]; then
-          RELEASE_NAME="${BRANCH_NAME:8}"
-          echo "Release Name: ${RELEASE_NAME}" ;
-          echo "Building Documentation for Release ${RELEASE_NAME}"
-          sed  "s/ENV_VERSION/$RELEASE_NAME/" source/conf.py
-          python -m pip install --user sphinx;
-          python -m pip install --user sphinx_toolbox.collapse;
-          python -m pip install --user faculty_sphinx_theme;
-          make html;
-          fi
+  documentation-publish:
+    needs: [build, sonarcloud]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - name: Get the current branch name
+      shell: bash
+      run: echo "::set-output name=branch::${GITHUB_REF#refs/heads/}"; echo "Branch Name = ${GITHUB_REF#refs/heads/}"
+      id: branch_name
+    - name: Build documentation only if on release branch
+      working-directory: ./docs
+      run: | 
+        BRANCH_NAME="${{ steps.branch_name.outputs.branch }}"
+        if [[ "${BRANCH_NAME:0:8}" = "release/" ]]; then
+        RELEASE_NAME="${BRANCH_NAME:8}"
+        echo "Release Name: ${RELEASE_NAME}" ;
+        echo "Building Documentation for Release ${RELEASE_NAME}"
+        sed  "s/ENV_VERSION/$RELEASE_NAME/" source/conf.py
+        python -m pip install --user sphinx;
+        python -m pip install --user sphinx_toolbox.collapse;
+        python -m pip install --user faculty_sphinx_theme;
+        make html;
+        fi
