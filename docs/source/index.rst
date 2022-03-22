@@ -13,9 +13,12 @@ Pyntel4004-CLI Documentation
    :maxdepth: 1
 
    Overview of the Intel 4004 <intelchipset>
-   Virtual Chip (Pyntel4004)
-   Getting Started
-   Command Line Interface
+   Command Line Interface <cli>
+
+   
+Virtual Chip (Pyntel4004)
+Getting Started
+
    
 Indices and tables
 ==================

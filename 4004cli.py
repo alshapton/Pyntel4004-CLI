@@ -23,15 +23,21 @@ from shared.shared import print_messages
 
 class Error(Exception):
     """Base class for other exceptions"""
-    pass
 
 
 class CoreNotInstalled(Error):
     """Exception for when Pyntel4004 is not installed"""
-    pass
 
 
-def excepthook(type, value, traceback):
+class ConfigFileNotFound(Error):
+    """Exception for when the configuration file specified cannot be found"""
+
+
+class BadFormat(Error):
+    """Exception for when the configuration file is badly formatted"""
+
+
+def excepthook(exc, value, traceback):
     print(value)
 
 
@@ -152,7 +158,47 @@ __version__ = pkg_resources.require(package)[0].version
 __core_version__ = getcoreversion()
 sys.excepthook = excepthook
 
-# ----------- Main Functionality ----------- #
+
+# ----------- Utility Functionality ----------- #
+
+def get_config(toml_file: str):
+    """
+    Retrieve a configuration file
+
+    Parameters
+    ----------
+    toml_file: str, mandatory
+        Name of the configuration file
+
+    Returns
+    -------
+    configuration: str
+        String containing the configuration data
+
+    Raises
+    ------
+    ConfigFileNotFound - the file cannot be opened
+    BadFormat - The configuration file is badly formatted TOML
+
+    Notes
+    -----
+    N/A
+
+    """
+    configuration = None
+    try:
+        _ = open(toml_file)
+    except OSError as e:
+        if str(e.strerror[0:12]) == 'No such file':
+            raise ConfigFileNotFound('Error:Configuration file not found.')
+    try:
+        configuration = toml.load(toml_file)
+    except (TypeError, TomlDecodeError):
+        raise BadFormat('Badly formatted configuration file')
+    return configuration
+
+
+# ----------- Check Functionality ----------- #
 
 
 def is_core_installed(package_name: str):
@@ -186,18 +232,7 @@ def is_core_installed(package_name: str):
         return True
 
 
-def get_config(toml_file: str):
-    configuration = None
-    try:
-        _ = open(toml_file)
-    except OSError as e:
-        if str(e.strerror[0:12]) == 'No such file':
-            raise click.BadParameter('Configuration file not found.')
-    try:
-        configuration = toml.load(toml_file)
-    except (TypeError, TomlDecodeError):
-        raise click.ClickException('Badly formatted configuration file')
-    return configuration
+# ----------- Main Functionality ----------- #
 
 
 @click.group()
