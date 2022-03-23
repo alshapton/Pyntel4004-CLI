@@ -16,7 +16,7 @@ sphinx:
    configuration: docs/conf.py
 
 submodules:
-  include: all
+  exclude: all
   
 # If using Sphinx, optionally build your docs in additional formats such as PDF
 # formats:
