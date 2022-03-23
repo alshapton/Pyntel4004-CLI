@@ -33,14 +33,12 @@ Basic Usage
 
      - `ALL` will deliver all of the above
 
-    .. collapse:: Changelog
-        
-        New in 0.0.1-alpha.2
+:Changelog: New in 0.0.1-alpha.2
+
  - **-c**, **- -config** `<config file>`: use the specified config file
  
-    .. collapse:: Changelog
-        
-        New in 0.0.1-alpha.2
+ :Changelog: New in 0.0.1-alpha.2
+
  - **-q**, **- -quiet**: Quiet mode on x
  - **-m**, **- -monitor**: Start monitor x
 
@@ -54,14 +52,12 @@ x Mutually exclusive parameters
 
 - **-l**, **- -labels**: show the label table (only available in .OBJ files)
 
-    .. collapse:: Changelog
-        
-        New in 0.0.1-alpha.2
-- **-c**, **- -config** `<config file>`: use the specified config file
+:Changelog: New in 0.0.1-alpha.2
+ 
+ **-c**, **- -config** `<config file>`: use the specified config file
 
-    .. collapse:: Changelog
-        
-        New in 0.0.1-alpha.2
+:Changelog: New in 0.0.1-alpha.2
+ 
 - **-b**, **- -inst**: number of instructions to disassemble (between 1 and 4096).
 - **-h**, **- -help**: Show help.
 
@@ -73,10 +69,9 @@ x Mutually exclusive parameters
 - **-o**, **- -object** `<object file>`: object code or binary input file.
 - **-c**, **- -config** `<config file>`: use the specified config file
 
-    .. collapse:: Changelog
-        
-        New in 0.0.1-alpha.2
-- **-q**, **- -quiet**: Quiet mode on
+:Changelog: New in 0.0.1-alpha.2
+ 
+ - **-q**, **- -quiet**: Quiet mode on
 
 - **-h**, **- -help**: Show help.
 
@@ -128,9 +123,8 @@ Error messages are displayed when there are issues with either the supplied comm
 
 Configuration Files
 -------------------
-    .. collapse:: Changelog
-        
-        New in 0.0.1-alpha.2
+
+:Changelog: New in 0.0.1-alpha.2 
 
 Pyntel4004-cli configuration files are specified using the `TOML <http://toml.io>`_ notation. This is a notation which favours humans over machines, so it is easy to understand and write the configuration you want.
 
