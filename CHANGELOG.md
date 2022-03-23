@@ -3,9 +3,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-## [0.0.1-alpha.2](https://pypi.org/project/Pyntel4004-cli/0.0.1a2/) - 2022-03-22
+
+## [0.0.1-alpha.3](https://pypi.org/project/Pyntel4004-cli/0.0.1a3/) - 2022-03-23
 
 ### Notes
+- Replaced 0.0.1-alpha.2
+
+## 0.0.1-alpha.2 - Not Released
+
+### Notes
+ **RELEASE ABORTED due to PyPi issues**
 - Requires
   - Click >= 8.0.4
   - Pyntel4004 >= 0.0.1-beta.5
