@@ -5,7 +5,6 @@
 .. |mu| replace:: :math:`{\mu}`
 .. |phi| replace:: :math:`{\phi}`
 .. |psi| replace:: :math:`{\psi}`
-.. |supplusminus| replace:: :supsub:`plusmn`
 
 .. |br| raw:: html
 
