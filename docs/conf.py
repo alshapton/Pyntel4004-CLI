@@ -39,13 +39,12 @@ release = 'ENV_VERSION'
 # ones.
 on_rtd = os.environ.get('READTHEDOCS') == 'True'
 if on_rtd:
-    extensions = ["sphinx.ext.autodoc", "sphinx_rtd_theme",
-                  "sphinx_toolbox"]
+    extensions = ["sphinx.ext.autodoc", "sphinx_rtd_theme"]
     html_theme = "alabaster"
 
 else:
     extensions = ["faculty_sphinx_theme", "sphinx.ext.autodoc",
-                  "sphinx_rtd_theme", "sphinx_toolbox.collapse"]
+                  "sphinx_rtd_theme"]
     html_theme = "faculty-sphinx-theme"
 
 
