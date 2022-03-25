@@ -1,0 +1,15 @@
+#!/bin/bash
+# Ensure version is the same as the branch name in several places
+
+BRANCH_NAME=`git rev-parse --abbrev-ref HEAD`
+echo "GIT HOOK for $BRANCH_NAME"
+
+#if [[ "${BRANCH_NAME:0:8}" = "release/" ]]; then
+#        RELEASE_NAME="${BRANCH_NAME:8}"
+#        echo "Release Name: ${RELEASE_NAME}" ;
+#        echo "Configuring documentation for Release ${RELEASE_NAME}"
+#        cat config.py | sed  "s/ENV_VERSION/$RELEASE_NAME/" > conf.new
+#        mv conf.new conf.py
+#        cat README.md | sed  "s/ENV_VERSION/$RELEASE_NAME/" > README.new
+#        mv README.new README.md
+    

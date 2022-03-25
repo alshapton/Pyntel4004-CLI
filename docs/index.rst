@@ -18,11 +18,3 @@ Pyntel4004-CLI Documentation
    
 Virtual Chip (Pyntel4004)
 Getting Started
-
-   
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`

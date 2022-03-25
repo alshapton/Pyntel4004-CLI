@@ -127,7 +127,10 @@ jobs:
         RELEASE_NAME="${BRANCH_NAME:8}"
         echo "Release Name: ${RELEASE_NAME}" ;
         echo "Building Documentation for Release ${RELEASE_NAME}"
-        sed  "s/ENV_VERSION/$RELEASE_NAME/" conf.py
+        cat config.py | sed  "s/ENV_VERSION/$RELEASE_NAME/" > conf.new
+        mv conf.new conf.py
+        cat README.md | sed  "s/ENV_VERSION/$RELEASE_NAME/" > README.new
+        mv README.new README.md
         python -m pip install --user sphinx;
         python -m pip install --user sphinx_toolbox
         python -m pip install --user faculty_sphinx_theme;
