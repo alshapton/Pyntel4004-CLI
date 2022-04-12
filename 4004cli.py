@@ -198,6 +198,9 @@ def get_config(toml_file: str):
     return configuration
 
 
+def get_operations(chip: Processor):
+    return chip.OPERATIONS
+
 # ----------- Check Functionality ----------- #
 
 
@@ -313,7 +316,8 @@ def asm(input, output, exec, monitor, quiet, type, config):
     result = assemble(input_file, output, chip, quiet, str(type_type))
     if result and exec:
         print_messages(quiet, 'EXEC', chip, '')
-        did_execute = execute(chip, 'rom', 0, monitor, quiet)
+        operations = get_operations(chip)
+        did_execute = execute(chip, 'rom', 0, monitor, quiet, operations)
         if did_execute:
             print_messages(quiet, 'BLANK', chip, '')
             print_messages(quiet, 'ACC', chip, '')
@@ -390,4 +394,5 @@ def exe(object, quiet, config):
     chip = Processor()
     result = retrieve(object_file, chip, quiet)
     memory_space = result[0]
-    execute(chip, memory_space, 0, False, quiet)
+    operations = get_operations(chip)
+    execute(chip, memory_space, 0, False, quiet, operations)

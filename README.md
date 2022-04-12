@@ -6,6 +6,8 @@
 
 <h1>Command Line Interface for Pyntel4004</h1>
 
+Version ENV_VERSION
+
 Basic Usage
 -----------
 
@@ -142,3 +144,4 @@ iv)  ```[exe]``` section containing directives for the execution of a specific o
 The valid configuration tokens are shown in the example above - they mirror the options that can be specified on the command line. 
 
 ANY of the configuration tokens can be overriden simply by specifying them on the command line.
+

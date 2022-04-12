@@ -4,6 +4,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.1-alpha.4](https://pypi.org/project/Pyntel4004-cli/0.0.1a4/) - 2022-XX-XX
+
+### Notes
+ **RELEASE ABORTED due to PyPi issues**
+- Requires
+  - Click >= 8.0.4
+  - Pyntel4004 >= 0.0.1-beta.5
+  - toml >= 0.10.2
+### Added
+- --labels option to Disassembler
+- --type option to Assembler
+- --config option to all commands to override from the configuration file
+- Updated documentation to include new usage instructions
+### Changed
+- 
+### Deprecated
+- 
+### Fixed
+-
+### Removed
+-
+### Security
+-
+
 ## [0.0.1-alpha.3](https://pypi.org/project/Pyntel4004-cli/0.0.1a3/) - 2022-03-23
 
 ### Notes
