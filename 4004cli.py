@@ -310,7 +310,6 @@ def asm(input, output, exec, monitor, quiet, type, config, results):
         else:
             raise click.BadOptionUsage(
                 "--config", "No 'asm' section in configuration file\n")
-
     # Create new instance of a processor
     chip = Processor()
     # Check exclusiveness of parameters
@@ -329,7 +328,9 @@ def asm(input, output, exec, monitor, quiet, type, config, results):
         print_messages(quiet, 'EXEC', chip, '')
         did_execute = execute(chip, 'rom', 0, monitor, quiet,
                               chip.OPERATIONS)
-        if did_execute and results:
+        if did_execute:
+            if results:
+                quiet = False
             print_messages(quiet, 'BLANK', chip, '')
             print_messages(quiet, 'ACC', chip, '')
             print_messages(quiet, 'CARRY', chip, '')
