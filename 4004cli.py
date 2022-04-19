@@ -73,6 +73,17 @@ def check_inst(inst):
     return inst
 
 
+def check_results(results, configuration):
+    if results is None:
+        if "results" in configuration:
+            results = configuration["results"]
+        else:
+            results = False
+    else:
+        results = True
+    return results
+
+
 def check_monitor(monitor, configuration):
     if monitor is None:
         if "monitor" in configuration:
@@ -198,9 +209,6 @@ def get_config(toml_file: str):
     return configuration
 
 
-def get_operations(chip: Processor):
-    return chip.OPERATIONS
-
 # ----------- Check Functionality ----------- #
 
 
@@ -257,6 +265,7 @@ def cli(ctx):
 
 
 @cli.command()
+@click.help_option('--help', '-h')
 @click.option('--input', '-i',
               help='4004 assembler source code.',
               type=str, metavar='<filename>')
@@ -265,17 +274,18 @@ def cli(ctx):
               metavar='<filename>')
 @click.option('--exec', '-x', is_flag=True, help='Execute program',
               default=None)
-@click.option('--quiet', '-q', is_flag=True, default=None,
-              help='Output on/off  [either/or   ]')
-@click.option('--monitor', '-m', is_flag=True, default=None,
-              help='Monitor on/off [but not both]')
 @click.option('--type', '-t', multiple=True, default=['None'],
               metavar='<extension>',
               help='Multiple output types can be specified - bin/obj/h/ALL')
 @click.option('--config', '-c', metavar='<filename>',
               help='Configuration file', default=None)
-@click.help_option('--help', '-h')
-def asm(input, output, exec, monitor, quiet, type, config):
+@click.option('--quiet', '-q', is_flag=True, default=None,
+              help='Output on/off    [Either/Or,  ]')
+@click.option('--monitor', '-m', is_flag=True, default=None,
+              help='Monitor on/off   [but not both]')
+@click.option('--results', '-r', is_flag=True, default=None,
+              help='Results on/off')
+def asm(input, output, exec, monitor, quiet, type, config, results):
     """Assemble the input file"""
     # Eliminate the "Shadowing" of builtins
     input_file = input
@@ -296,6 +306,7 @@ def asm(input, output, exec, monitor, quiet, type, config):
             exec = check_exec(exec, asm_configuration)
             monitor = check_monitor(monitor, asm_configuration)
             quiet = check_quiet(quiet, asm_configuration)
+            results = check_results(results, asm_configuration)
         else:
             raise click.BadOptionUsage(
                 "--config", "No 'asm' section in configuration file\n")
@@ -316,9 +327,9 @@ def asm(input, output, exec, monitor, quiet, type, config):
     result = assemble(input_file, output, chip, quiet, str(type_type))
     if result and exec:
         print_messages(quiet, 'EXEC', chip, '')
-        operations = get_operations(chip)
-        did_execute = execute(chip, 'rom', 0, monitor, quiet, operations)
-        if did_execute:
+        did_execute = execute(chip, 'rom', 0, monitor, quiet,
+                              chip.OPERATIONS)
+        if did_execute and results:
             print_messages(quiet, 'BLANK', chip, '')
             print_messages(quiet, 'ACC', chip, '')
             print_messages(quiet, 'CARRY', chip, '')
@@ -326,6 +337,7 @@ def asm(input, output, exec, monitor, quiet, type, config):
 
 
 @cli.command()
+@click.help_option('--help', '-h')
 @click.option('--object', '-o',
               help='4004 object or binary file (specify extension)',
               metavar='<filename>', type=str)
@@ -338,7 +350,6 @@ def asm(input, output, exec, monitor, quiet, type, config):
               is_flag=True, default=False)
 @click.option('--config', '-c', metavar='<filename>',
               help='Configuration file', default=None)
-@click.help_option('--help', '-h')
 def dis(object, inst, labels, config) -> None:
     """Disassemble the input file"""
     # Ensure that the core Pyntel4004 is installed
@@ -363,6 +374,7 @@ def dis(object, inst, labels, config) -> None:
 
 
 @cli.command()
+@click.help_option('--help', '-h')
 @click.option('--object', '-o',
               help='4004 object or binary file (specify extension)',
               metavar='<filename>', type=str)
@@ -370,7 +382,6 @@ def dis(object, inst, labels, config) -> None:
               help='Output on/off')
 @click.option('--config', '-c', metavar='<filename>',
               help='Configuration file', default=None)
-@click.help_option('--help', '-h')
 def exe(object, quiet, config):
     """Execute the object file"""
     # Ensure that the core Pyntel4004 is installed
@@ -394,5 +405,4 @@ def exe(object, quiet, config):
     chip = Processor()
     result = retrieve(object_file, chip, quiet)
     memory_space = result[0]
-    operations = get_operations(chip)
-    execute(chip, memory_space, 0, False, quiet, operations)
+    execute(chip, memory_space, 0, False, quiet, chip.OPERATIONS)

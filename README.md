@@ -40,7 +40,8 @@ Basic Usage
     - `ALL` will deliver all of the above<details>New in 0.0.1-alpha.2<summary>Changelog</summary></details>
 - **-c**, **--config** `<config file>`: use the specified config file<details>New in 0.0.1-alpha.2<summary>Changelog</summary></details>
 - **-q**, **--quiet**: Quiet mode on *
-- **-m**, **--monitor**: Start monitor*
+- **-m**, **--monitor**: Use monitor *
+- **-r**, **--results**: Show results after any execution of a program *
 
 - **-h**, **--help**: Show help.
 
