@@ -41,8 +41,7 @@ Basic Usage
 - **-c**, **--config** `<config file>`: use the specified config file<details>New in 0.0.1-alpha.2<summary>Changelog</summary></details>
 - **-q**, **--quiet**: Quiet mode on *
 - **-m**, **--monitor**: Use monitor *
-- **-r**, **--results**: Show results after any execution of a program *
-
+- **-r**, **--results**: Show results after any execution of a program <details>New in 0.0.1-alpha.4<summary>Changelog</summary></details>
 - **-h**, **--help**: Show help.
 
 *Mutually exclusive parameters
@@ -69,7 +68,7 @@ Basic Usage
 - **-o**, **--object** `<object file>`: object code or binary input file.
 - **-c**, **--config** `<config file>`: use the specified config file<details>New in 0.0.1-alpha.2<summary>Changelog</summary></details>
 - **-q**, **--quiet**: Quiet mode on
-
+- **-r**, **--results**: Show results after any execution of a program <details>New in 0.0.1-alpha.4<summary>Changelog</summary></details>
 - **-h**, **--help**: Show help.
 
 <br>
@@ -117,6 +116,7 @@ type = ["BIN", "H"]
 exec = true
 monitor = true
 quiet = true
+results = true
 
 [dis]
 object = "examples/example2.obj"
@@ -126,6 +126,7 @@ labels = true
 [exe]
 object = "examples/example2.obj"
 quiet = true
+results = true
 ```
 
 The configuration file has 4 sections:

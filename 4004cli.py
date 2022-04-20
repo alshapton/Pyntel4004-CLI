@@ -381,23 +381,25 @@ def dis(object, inst, labels, config) -> None:
               metavar='<filename>', type=str)
 @click.option('--quiet', '-q', is_flag=True,
               help='Output on/off')
+@click.option('--results', '-r', is_flag=True,
+              help='Results on/off')
 @click.option('--config', '-c', metavar='<filename>',
               help='Configuration file', default=None)
-def exe(object, quiet, config):
+def exe(object, quiet, config, results):
     """Execute the object file"""
     # Ensure that the core Pyntel4004 is installed
     # Exit if not
     if not is_core_installed(core_name):
         raise CoreNotInstalled(cini)
+    object_file = object
     if config is not None:
         configuration = get_config(config)
-        object_file = object
         if "exe" in configuration:
             exe_configuration = configuration["exe"]
             if "object" in exe_configuration and object_file is None:
                 object_file = exe_configuration["object"]
             quiet = check_quiet(quiet, exe_configuration)
-
+            results = check_results(results, exe_configuration)
         else:
             raise click.BadOptionUsage(
                 "--config", "No 'exe' section in configuration file\n")
@@ -406,4 +408,12 @@ def exe(object, quiet, config):
     chip = Processor()
     result = retrieve(object_file, chip, quiet)
     memory_space = result[0]
-    execute(chip, memory_space, 0, False, quiet, chip.OPERATIONS)
+    did_execute = execute(chip, memory_space, 0, False, quiet, chip.OPERATIONS)
+
+    if did_execute:
+        if results:
+            quiet = False
+        print_messages(quiet, 'BLANK', chip, '')
+        print_messages(quiet, 'ACC', chip, '')
+        print_messages(quiet, 'CARRY', chip, '')
+        print_messages(quiet, 'BLANK', chip, '')
