@@ -11,10 +11,13 @@ monitor = true
 quiet = false
 
 [dis]
-object = "examples/example2.obj"
+objectfile = "default.obj"
 inst = 3
 labels = false
 
 [exe]
-object = "examples/example2.obj"
-quiet = true
+objectfile = "default.obj"
+quiet = false
+
+[results]
+show = ['REGS']

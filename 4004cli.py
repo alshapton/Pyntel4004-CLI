@@ -18,7 +18,7 @@ from disassembler.disassemble import disassemble
 from executer.execute import execute
 from executer.exe_supporting import retrieve
 from hardware.processor import Processor
-from shared.shared import print_messages
+from shared.shared import print_messages, coredump
 
 
 class Error(Exception):
@@ -39,6 +39,48 @@ class BadFormat(Error):
 
 def excepthook(exc, value, traceback):
     print(value)
+
+
+global package, core_name, cini
+package = "Pyntel4004-cli"
+core_name = 'Pyntel4004'
+cini = '\n\n' + core_name + ' core is not installed - use \n\n' + \
+    '       pip install ' + core_name + '\n'
+
+sys.excepthook = excepthook
+
+
+# ----------- Check Functionality ----------- #
+
+def is_core_installed(package_name: str):
+    """
+    Check to see if the Pyntel4004 core is installed
+
+    Parameters
+    ----------
+    package_name: str, mandatory
+        Name of the Pyntel4004 core package
+
+    Returns
+    -------
+    True    - if the core package is installed
+    False   - if not
+
+    Raises
+    ------
+    N/A
+
+    Notes
+    -----
+    N/A
+
+    """
+    import importlib.util
+    spec = importlib.util.find_spec(package_name)
+    if spec is None:
+        return False
+    else:
+        return True
 
 
 def check_quiet(quiet, configuration):
@@ -73,17 +115,6 @@ def check_inst(inst):
     return inst
 
 
-def check_results(results, configuration):
-    if results is None:
-        if "results" in configuration:
-            results = configuration["results"]
-        else:
-            results = False
-    else:
-        results = True
-    return results
-
-
 def check_monitor(monitor, configuration):
     if monitor is None:
         if "monitor" in configuration:
@@ -93,6 +124,14 @@ def check_monitor(monitor, configuration):
     else:
         monitor = True
     return monitor
+
+
+def check_results_content(configuration):
+    if "show" in configuration:
+        show = configuration["show"]
+        if show is None:
+            show = "['ALL']"
+    return show
 
 
 def check_dis_content(configuration, object, inst, labels):
@@ -148,29 +187,19 @@ def check_type(type_type):
             raise click.BadOptionUsage("--type", "Cannot specify 'ALL' " +
                                        "with any others\n")
 
-
-def getcoreversion():
-    __core_version__ = 'Installed'
-    try:
-        __core_version__ = pkg_resources.require(core_name)[0].version
-    except CoreNotInstalled:
-        __core_version__ = 'Not Installed'
-    else:
-        __core_version__ = 'Installed but no legal version'
-    return __core_version__
-
-
-package = "Pyntel4004-cli"
-core_name = 'Pyntel4004'
-cini = '\n\n' + core_name + ' core is not installed - use \n\n' + \
-        '       pip install ' + core_name + '\n'
-module = os.path.basename(sys.argv[0])
-__version__ = pkg_resources.require(package)[0].version
-__core_version__ = getcoreversion()
-sys.excepthook = excepthook
-
-
 # ----------- Utility Functionality ----------- #
+
+
+def getversion(name: str):
+    __version__ = 'Installed'
+    try:
+        __version__ = pkg_resources.require(name)[0].version
+    except CoreNotInstalled:
+        __version__ = 'Not Installed'
+    else:
+        __version__ = 'Installed but no legal version'
+    return __version__
+
 
 def get_config(toml_file: str):
     """
@@ -209,49 +238,23 @@ def get_config(toml_file: str):
     return configuration
 
 
-# ----------- Check Functionality ----------- #
+# --------- Extended Functionality --------- #
 
 
-def is_core_installed(package_name: str):
-    """
-    Check to see if the Pyntel4004 core is installed
-
-    Parameters
-    ----------
-    package_name: str, mandatory
-        Name of the Pyntel4004 core package
-
-    Returns
-    -------
-    True    - if the core package is installed
-    False   - if not
-
-    Raises
-    ------
-    N/A
-
-    Notes
-    -----
-    N/A
-
-    """
-    import importlib.util
-    spec = importlib.util.find_spec(package_name)
-    if spec is None:
-        return False
-    else:
-        return True
-
+def print_extended_results(chip: Processor, requirements) -> None:
+    if requirements is None or requirements == []:
+        return
 
 # ----------- Main Functionality ----------- #
 
 
 @click.group()
 @click.help_option('--help', '-h')
-@click.version_option(__version__, '--version', '-v',
-                      prog_name=package + ' (' + module + ')',
-                      message='%(prog)s, Version %(version)s \n' + core_name +
-                      ' ' + 'Version: ' + __core_version__ + '\n' +
+@click.version_option(pkg_resources.require(package)[0].version,
+                      '--version', '-v', prog_name=package + ' (' +
+                      os.path.basename(sys.argv[0]) + ')',
+                      message='%(prog)s, Version %(version)s \n' + core_name
+                      + ' ' + 'Version: ' + getversion(core_name) + '\n' +
                       'Learn more at https://github.com/alshapton/Pyntel4004')
 @click.pass_context
 def cli(ctx):
@@ -278,7 +281,7 @@ def cli(ctx):
               metavar='<extension>',
               help='Multiple output types can be specified - bin/obj/h/ALL')
 @click.option('--config', '-c', metavar='<filename>',
-              help='Configuration file', default=None)
+              help='Configuration file', default='')
 @click.option('--quiet', '-q', is_flag=True, default=None,
               help='Output on/off    [Either/Or,  ]')
 @click.option('--monitor', '-m', is_flag=True, default=None,
@@ -295,9 +298,11 @@ def asm(input, output, exec, monitor, quiet, type, config, results):
     # Exit if not
     if not is_core_installed(core_name):
         raise CoreNotInstalled(cini)
+
     # Get configuration (override from command line if required)
     if config is not None:
         configuration = get_config(config)
+        show = check_results_content(configuration["results"])
         if "asm" in configuration:
             asm_configuration = configuration["asm"]
             input_file, output, type_type = \
@@ -306,10 +311,11 @@ def asm(input, output, exec, monitor, quiet, type, config, results):
             exec = check_exec(exec, asm_configuration)
             monitor = check_monitor(monitor, asm_configuration)
             quiet = check_quiet(quiet, asm_configuration)
-            results = check_results(results, asm_configuration)
         else:
             raise click.BadOptionUsage(
                 "--config", "No 'asm' section in configuration file\n")
+    else:
+        show = "['ALL']"
     # Create new instance of a processor
     chip = Processor()
     # Check exclusiveness of parameters
@@ -335,11 +341,14 @@ def asm(input, output, exec, monitor, quiet, type, config, results):
             print_messages(quiet, 'ACC', chip, '')
             print_messages(quiet, 'CARRY', chip, '')
             print_messages(quiet, 'BLANK', chip, '')
+            # Display results
+            if show != '':
+                coredump(chip, '', str(show))
 
 
 @cli.command()
 @click.help_option('--help', '-h')
-@click.option('--object', '-o',
+@click.option('--objectfile', '-o',
               help='4004 object or binary file (specify extension)',
               metavar='<filename>', type=str)
 @click.option('--inst', '-i',
@@ -347,23 +356,25 @@ def asm(input, output, exec, monitor, quiet, type, config, results):
               metavar='<Between 1 & 4096>',
               type=int)
 @click.option('--labels', '-l',
-              help='Show label table',
+              help='Show label table', type=bool,
               is_flag=True, default=False)
-@click.option('--config', '-c', metavar='<filename>',
-              help='Configuration file', default=None)
-def dis(object, inst, labels, config) -> None:
+@click.option('--config', '-c', metavar='<filename>', type=str,
+              help='Configuration file', default='')
+def dis(objectfile: str, inst: int, labels: bool,
+        config) -> None:
     """Disassemble the input file"""
     # Ensure that the core Pyntel4004 is installed
     # Exit if not
     if not is_core_installed(core_name):
         raise CoreNotInstalled(cini)
-    object_file = object
-    if config is not None:
+    object_file = objectfile
+    if config != '':
         configuration = get_config(config)
         if "dis" in configuration:
             dis_configuration = configuration["dis"]
             object_file, inst, labels = check_dis_content(dis_configuration,
-                                                          object, inst, labels)
+                                                          object_file, inst,
+                                                          labels)
         else:
             raise click.BadOptionUsage(
                 "--config", "No 'dis' section in configuration file\n")
@@ -376,40 +387,40 @@ def dis(object, inst, labels, config) -> None:
 
 @cli.command()
 @click.help_option('--help', '-h')
-@click.option('--object', '-o',
+@click.option('--objectfile', '-o',
               help='4004 object or binary file (specify extension)',
-              metavar='<filename>', type=str)
+              metavar='<filename>')
 @click.option('--quiet', '-q', is_flag=True,
               help='Output on/off')
 @click.option('--results', '-r', is_flag=True,
               help='Results on/off')
 @click.option('--config', '-c', metavar='<filename>',
-              help='Configuration file', default=None)
-def exe(object, quiet, config, results):
+              help='Configuration file', default='')
+def exe(objectfile, quiet, config, results):
     """Execute the object file"""
     # Ensure that the core Pyntel4004 is installed
     # Exit if not
     if not is_core_installed(core_name):
         raise CoreNotInstalled(cini)
-    object_file = object
-    if config is not None:
+    if config != '':
         configuration = get_config(config)
+        show = check_results_content(configuration["results"])
         if "exe" in configuration:
             exe_configuration = configuration["exe"]
-            if "object" in exe_configuration and object_file is None:
-                object_file = exe_configuration["object"]
+            if "objectfile" in exe_configuration and objectfile is None:
+                objectfile = exe_configuration["objectfile"]
             quiet = check_quiet(quiet, exe_configuration)
-            results = check_results(results, exe_configuration)
         else:
             raise click.BadOptionUsage(
                 "--config", "No 'exe' section in configuration file\n")
-
+    else:
+        show = "['ALL']"
     # Create new instance of a processor
     chip = Processor()
-    result = retrieve(object_file, chip, quiet)
+    result = retrieve(objectfile, chip, quiet)
     memory_space = result[0]
     did_execute = execute(chip, memory_space, 0, False, quiet, chip.OPERATIONS)
-
+    print("here")
     if did_execute:
         if results:
             quiet = False
@@ -417,3 +428,6 @@ def exe(object, quiet, config, results):
         print_messages(quiet, 'ACC', chip, '')
         print_messages(quiet, 'CARRY', chip, '')
         print_messages(quiet, 'BLANK', chip, '')
+        # Display results
+        if show != '':
+            coredump(chip, '', str(show))

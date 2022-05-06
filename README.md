@@ -82,7 +82,7 @@ Error messages are displayed when there are issues with either the supplied comm
 Errors
 ------
 
-| Command  | Exception  | Options | Message  |
+| Command  | Exception  | Option(s) | Message  |
 |---|---|----|--|
 | asm  | BadParameter   | |Invalid Parameter Combination: --quiet and --monitor cannot be used together  |
 | asm  | BadOptionUsage  | --type |Invalid output type specified | 
